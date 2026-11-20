@@ -1,0 +1,22 @@
+; pawprint.furry: a normal domain with real records in it
+$ORIGIN pawprint.furry.
+$TTL 300
+
+@       IN SOA  ns1 hostmaster (
+                2025111901 ; serial (bump this on every change!)
+                1800       ; refresh
+                900        ; retry
+                604800     ; expire
+                300 )      ; negative-caching TTL
+
+@       IN NS    ns1
+ns1     IN A     10.53.0.4
+
+@       IN A     10.53.0.80
+@       IN AAAA  fd53::80
+www     IN CNAME @
+wiki    IN A     10.53.0.81
+@       IN MX    10 mail
+mail    IN A     10.53.0.25
+@       IN TXT   "v=spf1 mx -all"
+_motd   IN TXT   "Hello from the pawprint.furry nameserver!"

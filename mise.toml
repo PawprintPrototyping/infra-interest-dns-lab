@@ -1,0 +1,7 @@
+[tools]
+node = "latest"
+# mmdc renders the mermaid diagrams for presenterm.  Stupid workaround:
+# chromium-bidi (via puppeteer) moved to Chromium-versioned releases published
+# by Google's chrome-devtools-npm account without npm provenance. Exempt only
+# that exact version from mise's trust no-downgrade policy.
+"npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = ["chromium-bidi@157.0.8090-0"] }

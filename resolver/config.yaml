@@ -1,0 +1,18 @@
+# Knot Resolver 6: recursive resolver for the lab
+workers: 1
+
+logging:
+  level: info
+
+network:
+  do-ipv6: false
+  listen:
+    - interface: 0.0.0.0@53
+
+dnssec:
+  # The lab root is not signed with the real root key, so validation would
+  # mark every answer as bogus. Turn it off for the lab.
+  enable: false
+
+cache:
+  size-max: 10M

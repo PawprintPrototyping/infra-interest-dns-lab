@@ -1,0 +1,97 @@
+# DNS delegation lab
+#
+#   client ──► resolver (Knot Resolver, recursive)
+#                 │
+#                 ├─► root          "."             a.root-servers.net   10.53.0.2
+#                 ├─► tld-furry     "furry."        ns1.nic.furry        10.53.0.3
+#                 ├─► pawprint      "pawprint.furry." ns1.pawprint.furry 10.53.0.4
+#                 └─► fox           "fox.furry."    ns1.fox.furry        10.53.0.5  (not delegated yet: exercise)
+#
+# Authoritative servers run Knot DNS. The recursive resolver runs Knot Resolver.
+
+name: dnslab
+
+x-knot: &knot
+  image: cznic/knot:3.6
+  command: ["knotd", "-c", "/config/knot.conf"]
+  restart: unless-stopped
+
+services:
+  root:
+    <<: *knot
+    container_name: dnslab-root
+    hostname: a.root-servers.net
+    volumes:
+      - ./servers/root:/config:ro
+    networks:
+      dnslab:
+        ipv4_address: 10.53.0.2
+
+  tld-furry:
+    <<: *knot
+    container_name: dnslab-tld-furry
+    hostname: ns1.nic.furry
+    volumes:
+      - ./servers/tld-furry:/config:ro
+    networks:
+      dnslab:
+        ipv4_address: 10.53.0.3
+
+  pawprint:
+    <<: *knot
+    container_name: dnslab-pawprint
+    hostname: ns1.pawprint.furry
+    volumes:
+      - ./servers/pawprint:/config:ro
+    networks:
+      dnslab:
+        ipv4_address: 10.53.0.4
+
+  fox:
+    <<: *knot
+    container_name: dnslab-fox
+    hostname: ns1.fox.furry
+    volumes:
+      - ./servers/fox:/config:ro
+    networks:
+      dnslab:
+        ipv4_address: 10.53.0.5
+
+  resolver:
+    image: cznic/knot-resolver:v6.5.1
+    container_name: dnslab-resolver
+    restart: unless-stopped
+    volumes:
+      - ./resolver/config.yaml:/etc/knot-resolver/config.yaml:ro
+      # Replace the real Internet root hints with our lab root server.
+      - ./resolver/root.hints:/usr/share/dns/root.hints:ro
+    # Reachable from the host on loopback only: dig @127.0.0.1 -p 1053 ...
+    ports:
+      - "127.0.0.1:1053:53/udp"
+      - "127.0.0.1:1053:53/tcp"
+    networks:
+      dnslab:
+        ipv4_address: 10.53.0.53
+    depends_on: [root, tld-furry, pawprint, fox]
+
+  # A "laptop" on the lab network. Uses the lab resolver as its DNS server.
+  # Has dig (bind-tools) and kdig (knot-utils).
+  client:
+    build: ./client
+    image: dnslab-client
+    container_name: dnslab-client
+    hostname: client
+    init: true
+    volumes:
+      - ./client/resolv.conf:/etc/resolv.conf:ro
+    networks:
+      dnslab:
+        ipv4_address: 10.53.0.100
+    depends_on: [resolver]
+
+networks:
+  dnslab:
+    name: dnslab
+    ipam:
+      config:
+        - subnet: 10.53.0.0/24

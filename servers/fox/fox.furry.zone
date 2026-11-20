@@ -1,0 +1,19 @@
+; fox.furry: served by ns1.fox.furry, but NOT delegated from furry. yet.
+; Until the furry. TLD adds NS + glue for us, only people who ask this
+; server directly (kdig @10.53.0.5) can see these records.
+$ORIGIN fox.furry.
+$TTL 300
+
+@       IN SOA  ns1 hostmaster (
+                2025111901 ; serial
+                1800       ; refresh
+                900        ; retry
+                604800     ; expire
+                300 )      ; negative-caching TTL
+
+@       IN NS   ns1
+ns1     IN A    10.53.0.5
+
+@       IN A    10.53.0.90
+www     IN A    10.53.0.90
+@       IN TXT  "Yip! You found the fox den."

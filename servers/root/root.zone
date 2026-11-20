@@ -1,0 +1,22 @@
+; The lab root zone "."
+;
+; The root knows almost nothing. Its job is to say "who handles each TLD?"
+; Each TLD gets NS records (the delegation) plus A records for the
+; nameservers (the "glue"), so resolvers can find them.
+$ORIGIN .
+$TTL 3600
+
+@                   IN SOA  a.root-servers.net. hostmaster.root-servers.net. (
+                            2025111901 ; serial (bump this on every change!)
+                            1800       ; refresh
+                            900        ; retry
+                            604800     ; expire
+                            300 )      ; negative-caching TTL
+
+; Who is authoritative for the root itself
+@                   IN NS   a.root-servers.net.
+a.root-servers.net. IN A    10.53.0.2
+
+; ---- Delegation: furry. ----------------------------------------------------
+furry.              IN NS   ns1.nic.furry.
+ns1.nic.furry.      IN A    10.53.0.3        ; glue

@@ -1,0 +1,31 @@
+; The "furry." top-level domain
+;
+; The TLD registry delegates second-level domains (pawprint.furry, ...)
+; to whichever nameservers the domain owner tells them about.
+$ORIGIN furry.
+$TTL 3600
+
+@               IN SOA  ns1.nic.furry. hostmaster.nic.furry. (
+                        2025111901 ; serial (bump this on every change!)
+                        1800       ; refresh
+                        900        ; retry
+                        604800     ; expire
+                        300 )      ; negative-caching TTL
+
+@               IN NS   ns1.nic
+ns1.nic         IN A    10.53.0.3
+
+; The registry's own website
+nic             IN A    10.53.0.3
+nic             IN TXT  "The .furry registry. Awoo."
+
+; ---- Delegation: pawprint.furry. -------------------------------------------
+pawprint        IN NS   ns1.pawprint
+ns1.pawprint    IN A    10.53.0.4      ; glue
+
+; ---- Delegation: fox.furry. (EXERCISE) -------------------------------------
+; ns1.fox.furry (10.53.0.5) is already running and serving fox.furry,
+; but nobody can find it yet. Uncomment these two lines, bump the serial
+; above, then:  docker exec dnslab-tld-furry knotc zone-reload furry.
+fox             IN NS   ns1.fox
+ns1.fox         IN A    10.53.0.5      ; glue

@@ -27,5 +27,5 @@ ns1.pawprint    IN A    10.53.0.4      ; glue
 ; ns1.fox.furry (10.53.0.5) is already running and serving fox.furry,
 ; but nobody can find it yet. Uncomment these two lines, bump the serial
 ; above, then:  docker exec dnslab-tld-furry knotc zone-reload furry.
-fox             IN NS   ns1.fox
-ns1.fox         IN A    10.53.0.5      ; glue
+;fox             IN NS   ns1.fox
+;ns1.fox         IN A    10.53.0.5      ; glue
